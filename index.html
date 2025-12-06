@@ -380,6 +380,173 @@
             display: block;
         }
 
+        .chatbot-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 350px;
+            max-height: 500px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 40px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            overflow: hidden;
+        }
+
+        .chatbot-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .chatbot-header h3 {
+            margin: 0;
+            font-size: 1.1em;
+        }
+
+        .chatbot-toggle {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2em;
+            cursor: pointer;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .chat-message {
+            display: flex;
+            gap: 8px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chat-message.user {
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 10px;
+            line-height: 1.4;
+            font-size: 0.95em;
+        }
+
+        .chat-message.bot .message-content {
+            background: #f0f4ff;
+            color: #333;
+            border-left: 3px solid #667eea;
+        }
+
+        .chat-message.user .message-content {
+            background: #667eea;
+            color: white;
+        }
+
+        .chat-input {
+            padding: 12px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 8px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            padding: 10px 15px;
+            font-size: 0.9em;
+            outline: none;
+        }
+
+        .chat-input input:focus {
+            border-color: #667eea;
+        }
+
+        .chat-input button {
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input button:hover {
+            background: #5568d3;
+            transform: scale(1.05);
+        }
+
+        .quick-options {
+            padding: 0 15px 10px;
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .quick-btn {
+            padding: 5px 12px;
+            background: #e6f7ed;
+            border: 1px solid #48bb78;
+            color: #22543d;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 0.8em;
+            transition: all 0.3s ease;
+        }
+
+        .quick-btn:hover {
+            background: #48bb78;
+            color: white;
+        }
+
+        .chatbot-closed .chat-messages,
+        .chatbot-closed .chat-input,
+        .chatbot-closed .quick-options {
+            display: none;
+        }
+
+        @media (max-width: 480px) {
+            .chatbot-container {
+                width: 100%;
+                height: 100%;
+                max-height: 100vh;
+                right: 0;
+                bottom: 0;
+                border-radius: 0;
+            }
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -451,6 +618,27 @@
         <div class="stars" id="rewardStars">⭐⭐</div>
         <div class="reward-text" id="rewardText">Correct!</div>
         <div style="font-size: 1.2em; color: #667eea; font-weight: 700;" id="rewardPoints">+10 points</div>
+    </div>
+
+    <!-- Chatbot -->
+    <div class="chatbot-container chatbot-closed" id="chatbotContainer">
+        <div class="chatbot-header" onclick="toggleChatbot()">
+            <div>
+                <h3>🤖 Math Helper</h3>
+                <p style="font-size: 0.8em; margin: 5px 0 0 0; opacity: 0.9;">Ask for help!</p>
+            </div>
+            <button class="chatbot-toggle" onclick="toggleChatbot(event)">−</button>
+        </div>
+        <div class="quick-options" id="quickOptions">
+            <button class="quick-btn" onclick="sendMessage('Explain this question')">Explain Question</button>
+            <button class="quick-btn" onclick="sendMessage('Give more examples')">More Examples</button>
+            <button class="quick-btn" onclick="sendMessage('Practice more')">Practice More</button>
+        </div>
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-input">
+            <input type="text" id="chatInput" placeholder="Ask me anything..." onkeypress="handleChatKeypress(event)">
+            <button onclick="sendChatMessage()">↑</button>
+        </div>
     </div>
 
     <script>
@@ -950,7 +1138,156 @@
                 </div>
             `;
             updateStats();
+            initializeChat();
         }
+
+        // Chatbot Functionality
+        let chatHistory = [];
+
+        const chatbotResponses = {
+            'explain': {
+                'probability': 'Probability is the chance of an event happening. It ranges from 0 to 1. Formula: P(event) = Favorable outcomes / Total outcomes. Example: Rolling a die, probability of getting 3 = 1/6',
+                'ratio': 'A ratio compares two quantities using division. It can be written as a:b or a/b. Example: If boys:girls = 3:5, it means for every 3 boys, there are 5 girls.',
+                'triangle angles': 'The sum of all angles in a triangle is always 180°. Example: If angles are 60°, 70°, then third angle = 180° - 60° - 70° = 50°',
+                'proportion': 'A proportion is a statement that two ratios are equal. If a:b = c:d, then ad = bc (cross multiplication). Example: 2:3 = 4:6 because 2×6 = 3×4',
+                'pythagoras': 'In a right triangle: a² + b² = c², where c is the hypotenuse. Example: If sides are 3 and 4, hypotenuse = √(9+16) = √25 = 5',
+                'mean proportional': 'Mean proportional between a and b is √(a×b). Example: Mean proportional between 4 and 9 = √(4×9) = √36 = 6'
+            },
+            'practice': [
+                'Similar triangle problem: A 6m pole casts 4m shadow. Another pole casts 6m shadow. Find height.',
+                'Ratio problem: Divide 100 in ratio 2:3:5.',
+                'Angle problem: Angles in ratio 1:2:3. Find all angles.',
+                'Probability problem: Drawing a card from deck. Find P(Red card).',
+                'Proportion problem: If 8:x = 12:15, find x.'
+            ]
+        };
+
+        function initializeChat() {
+            chatHistory = [];
+            document.getElementById('chatMessages').innerHTML = '';
+            addBotMessage('👋 Hi! I\'m your Math Helper. I can explain topics, give more examples, or suggest practice problems. How can I help you today?');
+        }
+
+        function toggleChatbot(event) {
+            if (event) event.stopPropagation();
+            const container = document.getElementById('chatbotContainer');
+            container.classList.toggle('chatbot-closed');
+        }
+
+        function addBotMessage(text) {
+            const messagesDiv = document.getElementById('chatMessages');
+            const messageEl = document.createElement('div');
+            messageEl.className = 'chat-message bot';
+            messageEl.innerHTML = `<div class="message-content">${text}</div>`;
+            messagesDiv.appendChild(messageEl);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function addUserMessage(text) {
+            const messagesDiv = document.getElementById('chatMessages');
+            const messageEl = document.createElement('div');
+            messageEl.className = 'chat-message user';
+            messageEl.innerHTML = `<div class="message-content">${text}</div>`;
+            messagesDiv.appendChild(messageEl);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function handleChatKeypress(event) {
+            if (event.key === 'Enter') {
+                sendChatMessage();
+            }
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            addUserMessage(message);
+            input.value = '';
+
+            // Process user message
+            setTimeout(() => {
+                processMessage(message);
+            }, 500);
+        }
+
+        function sendMessage(message) {
+            addUserMessage(message);
+            setTimeout(() => {
+                processMessage(message);
+            }, 500);
+        }
+
+        function processMessage(message) {
+            const lower = message.toLowerCase();
+            let response = '';
+
+            if (lower.includes('explain') || lower.includes('what is')) {
+                response = getExplanation(message);
+            } else if (lower.includes('example') || lower.includes('solve')) {
+                response = getExamples(message);
+            } else if (lower.includes('practice') || lower.includes('more question')) {
+                response = getPracticeProblems();
+            } else if (lower.includes('ratio')) {
+                response = chatbotResponses.explain.ratio + '<br><br><strong>Example:</strong> If A:B = 2:3 and A = 10, find B. Solution: 2:3 = 10:B → 2B = 30 → B = 15';
+            } else if (lower.includes('probability')) {
+                response = chatbotResponses.explain.probability + '<br><br><strong>Example:</strong> In a deck of 52 cards, P(Heart) = 13/52 = 1/4';
+            } else if (lower.includes('triangle') || lower.includes('angle')) {
+                response = chatbotResponses.explain['triangle angles'] + '<br><br><strong>Example:</strong> If angles are in ratio 1:2:3, find them. Sum = 1+2+3 = 6 parts. Each part = 180/6 = 30°. Angles: 30°, 60°, 90°';
+            } else if (lower.includes('proportion')) {
+                response = chatbotResponses.explain.proportion + '<br><br><strong>Example:</strong> Find x if 3:5 = 6:x. Using cross multiplication: 3x = 30 → x = 10';
+            } else if (lower.includes('pythagoras') || lower.includes('distance')) {
+                response = chatbotResponses.explain.pythagoras + '<br><br><strong>Example:</strong> A man goes 3m east and 4m north. Distance from start = √(3²+4²) = 5m';
+            } else if (lower.includes('mean') || lower.includes('proportional')) {
+                response = chatbotResponses.explain['mean proportional'] + '<br><br><strong>Example:</strong> Mean proportional between 2 and 8 = √(2×8) = √16 = 4';
+            } else {
+                response = '📚 <strong>Quick Topics I can explain:</strong><br>' +
+                    '• Probability<br>' +
+                    '• Ratios & Proportions<br>' +
+                    '• Triangle Angles<br>' +
+                    '• Pythagoras Theorem<br>' +
+                    '• Mean Proportional<br><br>' +
+                    'Type "explain [topic]" or ask "give more examples"!';
+            }
+
+            addBotMessage(response);
+        }
+
+        function getExplanation(message) {
+            if (message.toLowerCase().includes('ratio')) return chatbotResponses.explain.ratio;
+            if (message.toLowerCase().includes('probability')) return chatbotResponses.explain.probability;
+            if (message.toLowerCase().includes('angle') || message.toLowerCase().includes('triangle')) return chatbotResponses.explain['triangle angles'];
+            if (message.toLowerCase().includes('proportion')) return chatbotResponses.explain.proportion;
+            if (message.toLowerCase().includes('pythagoras')) return chatbotResponses.explain.pythagoras;
+            return 'Which topic would you like explained? Try asking about ratios, probability, triangles, proportions, or Pythagoras theorem!';
+        }
+
+        function getExamples(message) {
+            const examples = [
+                '<strong>📌 Ratio Example:</strong><br>Class has boys:girls = 5:3. Total = 40 students.<br>Boys = (5/8)×40 = 25, Girls = (3/8)×40 = 15',
+                '<strong>📌 Probability Example:</strong><br>Dice thrown. P(odd number) = ?<br>Odd numbers: 1,3,5 = 3 outcomes<br>Total = 6 outcomes<br>P(odd) = 3/6 = 1/2',
+                '<strong>📌 Angle Example:</strong><br>Triangle angles in ratio 2:3:5. Find all.<br>Total parts = 10. Each = 18°<br>Angles: 36°, 54°, 90°',
+                '<strong>📌 Proportion Example:</strong><br>If 4:7 = 12:x, find x.<br>4x = 7×12 = 84<br>x = 21',
+                '<strong>📌 Distance Example:</strong><br>Person goes 12m west, 5m north.<br>Distance = √(144+25) = √169 = 13m'
+            ];
+            return examples[Math.floor(Math.random() * examples.length)];
+        }
+
+        function getPracticeProblems() {
+            const problems = chatbotResponses.practice;
+            let response = '<strong>🎯 Try These Practice Problems:</strong><br>';
+            for (let i = 0; i < 3; i++) {
+                response += `${i+1}. ${problems[Math.floor(Math.random() * problems.length)]}<br>`;
+            }
+            response += '<br>Try solving these and I can help if you get stuck!';
+            return response;
+        }
+
+        // Initialize chat when page loads
+        window.addEventListener('load', () => {
+            initializeChat();
+        });
     </script>
 </body>
 </html>
