@@ -563,6 +563,10 @@
             background: #667eea;
             color: white;
         }
+
+        table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
     </style>
 </head>
 <body>
@@ -598,6 +602,11 @@
         <div class="controls">
             <button class="btn-control btn-start" onclick="startQuiz()">▶️ Start Quiz</button>
             <button class="btn-control btn-reset" onclick="resetQuiz()">🔄 Reset</button>
+            <button class="btn-control" style="background: #9f7aea; color: white;" onclick="toggleQuizSet()">📚 Switch Questions</button>
+        </div>
+        
+        <div style="text-align: center; padding: 10px; background: #f0f4ff; border-bottom: 1px solid #e0e0e0; display: none;" id="quizSetIndicator">
+            <span style="font-weight: 600; color: #667eea;">Current Quiz Set: <span id="currentSet">Gamified Quiz (29 Questions)</span></span>
         </div>
 
         <div class="content" id="quizContent">
@@ -621,10 +630,10 @@
     </div>
 
     <!-- Chatbot -->
-    <div class="chatbot-container chatbot-closed" id="chatbotContainer">
-        <div class="chatbot-header" onclick="toggleChatbot()">
+    <div class="chatbot-container" id="chatbotContainer" style="display: none;">
+        <div class="chatbot-header" onclick="toggleChatbot(event)" style="cursor: pointer;">
             <div>
-                <h3>🤖 Math Helper</h3>
+                <h3 style="margin: 0;">🤖 Math Helper</h3>
                 <p style="font-size: 0.8em; margin: 5px 0 0 0; opacity: 0.9;">Ask for help!</p>
             </div>
             <button class="chatbot-toggle" onclick="toggleChatbot(event)">−</button>
@@ -634,10 +643,10 @@
             <button class="quick-btn" onclick="sendMessage('Give more examples')">More Examples</button>
             <button class="quick-btn" onclick="sendMessage('Practice more')">Practice More</button>
         </div>
-        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-messages" id="chatMessages" style="height: 250px;"></div>
         <div class="chat-input">
             <input type="text" id="chatInput" placeholder="Ask me anything..." onkeypress="handleChatKeypress(event)">
-            <button onclick="sendChatMessage()">↑</button>
+            <button onclick="sendChatMessage()" style="border: none;">↑</button>
         </div>
     </div>
 
@@ -936,12 +945,189 @@
             }
         ];
 
+        // Traditional Question Set (Section A, B, C, D, E, F from original)
+        const traditionalQuizzes = [
+            {
+                id: 1,
+                question: "Express the ratio 6:7 in its simplest form.",
+                options: ["6:7", "3:3.5", "12:14", "2:2.33"],
+                correct: 0,
+                answer: "6:7",
+                explanation: "GCD(6,7) = 1. Already in simplest form.",
+                difficulty: "easy",
+                points: 5
+            },
+            {
+                id: 2,
+                question: "Find the fourth proportional to 3, 5 and 6.",
+                options: ["8", "10", "12", "15"],
+                correct: 1,
+                answer: "10",
+                explanation: "3:5 :: 6:x → 3x = 30 → x = 10",
+                difficulty: "medium",
+                points: 10
+            },
+            {
+                id: 3,
+                question: "Find the third proportional to 2, 9 and 15.",
+                options: ["40.5", "45", "50", "54"],
+                correct: 0,
+                answer: "40.5",
+                explanation: "2:9 :: 9:x → 2x = 81 → x = 40.5",
+                difficulty: "hard",
+                points: 15
+            },
+            {
+                id: 4,
+                question: "The sides of a triangle are in ratio 1:2:3, perimeter 36cm. Find sides.",
+                options: ["6, 12, 18", "4, 8, 12", "8, 16, 24", "5, 10, 15"],
+                correct: 0,
+                answer: "6, 12, 18",
+                explanation: "k + 2k + 3k = 36 → 6k = 36 → k = 6",
+                difficulty: "easy",
+                points: 5
+            },
+            {
+                id: 5,
+                question: "Find the fourth proportional to 11, 15 and 22.",
+                options: ["25", "28", "30", "33"],
+                correct: 2,
+                answer: "30",
+                explanation: "11:15 :: 22:x → 11x = 330 → x = 30",
+                difficulty: "medium",
+                points: 10
+            },
+            {
+                id: 6,
+                question: "Find mean proportional between 6 and 24.",
+                options: ["12", "15", "18", "20"],
+                correct: 0,
+                answer: "12",
+                explanation: "√(6 × 24) = √144 = 12",
+                difficulty: "medium",
+                points: 10
+            },
+            {
+                id: 7,
+                question: "Find mean proportional between 3 and 27.",
+                options: ["6", "9", "12", "15"],
+                correct: 1,
+                answer: "9",
+                explanation: "√(3 × 27) = √81 = 9",
+                difficulty: "easy",
+                points: 5
+            },
+            {
+                id: 8,
+                question: "Property sold for ₹72,00,000 divided in ratio 7:11. Praful's share?",
+                options: ["₹28,00,000", "₹36,00,000", "₹44,00,000", "₹56,00,000"],
+                correct: 2,
+                answer: "₹44,00,000",
+                explanation: "(11/18) × 72,00,000 = ₹44,00,000",
+                difficulty: "medium",
+                points: 10
+            },
+            {
+                id: 9,
+                question: "Find mean proportional between 0.4 and 0.9.",
+                options: ["0.4", "0.5", "0.6", "0.7"],
+                correct: 2,
+                answer: "0.6",
+                explanation: "√(0.4 × 0.9) = √0.36 = 0.6",
+                difficulty: "medium",
+                points: 10
+            },
+            {
+                id: 10,
+                question: "Two numbers in ratio 3:5. Adding 8 to each gives ratio 2:3. Find numbers.",
+                options: ["15, 25", "24, 40", "12, 20", "18, 30"],
+                correct: 1,
+                answer: "24, 40",
+                explanation: "(3k+8):(5k+8) = 2:3 → 3(3k+8) = 2(5k+8) → k = 8",
+                difficulty: "hard",
+                points: 15
+            },
+            {
+                id: 11,
+                question: "Three numbers in ratio 2:3:5, sum is 800. Find them.",
+                options: ["100, 200, 300", "160, 240, 400", "120, 180, 300", "80, 160, 400"],
+                correct: 1,
+                answer: "160, 240, 400",
+                explanation: "10k = 800 → k = 80. Numbers: 160, 240, 400",
+                difficulty: "medium",
+                points: 10
+            },
+            {
+                id: 12,
+                question: "Boys and girls in ratio 7:4, total 550. How many boys?",
+                options: ["300", "320", "350", "380"],
+                correct: 2,
+                answer: "350",
+                explanation: "(7/11) × 550 = 350",
+                difficulty: "easy",
+                points: 5
+            },
+            {
+                id: 13,
+                question: "Monthly income to savings ratio 7:2. Savings = ₹500. Income?",
+                options: ["₹1500", "₹1750", "₹2000", "₹2250"],
+                correct: 1,
+                answer: "₹1750",
+                explanation: "2 parts = ₹500 → Income = 7 × 250 = ₹1750",
+                difficulty: "medium",
+                points: 10
+            },
+            {
+                id: 14,
+                question: "Ages in ratio 5:7. 18 years ago ratio was 8:13. Present ages?",
+                options: ["40, 56", "45, 63", "50, 70", "55, 77"],
+                correct: 2,
+                answer: "50, 70",
+                explanation: "Let 5k and 7k. (5k-18):(7k-18) = 8:13 → k = 10",
+                difficulty: "hard",
+                points: 15
+            },
+            {
+                id: 15,
+                question: "One angle 70°, other two equal. Find them.",
+                options: ["45°, 45°", "55°, 55°", "60°, 60°", "65°, 65°"],
+                correct: 1,
+                answer: "55°, 55°",
+                explanation: "70 + x + x = 180 → 2x = 110 → x = 55°",
+                difficulty: "easy",
+                points: 5
+            }
+        ];
+
+        function toggleQuizSet() {
+            if (quizStarted) {
+                alert('Cannot switch quiz sets while quiz is in progress. Please finish or reset first.');
+                return;
+            }
+
+            activeQuizSet = activeQuizSet === 'gamified' ? 'traditional' : 'gamified';
+            const indicator = document.getElementById('quizSetIndicator');
+            const setName = activeQuizSet === 'gamified' ? 'Gamified Quiz (29 Questions)' : 'Traditional Quiz (15 Questions)';
+            
+            document.getElementById('currentSet').textContent = setName;
+            indicator.style.display = 'block';
+            
+            resetQuiz();
+            
+            setTimeout(() => {
+                indicator.style.display = 'none';
+            }, 3000);
+        }
+
         let currentQuizIndex = 0;
         let score = 0;
         let streak = 0;
         let answered = 0;
         let correct = 0;
         let quizStarted = false;
+
+        let activeQuizSet = 'gamified'; // 'gamified' or 'traditional'
+        let chatHistory = [];
 
         function startQuiz() {
             quizStarted = true;
@@ -953,35 +1139,30 @@
             showQuestion();
         }
 
-        function showQuestion() {
-            if (currentQuizIndex >= quizzes.length) {
-                showResults();
-                return;
-            }
-
             const quiz = quizzes[currentQuizIndex];
-            const progressPercent = ((currentQuizIndex) / quizzes.length) * 100;
+            const currentQuestion = quiz[currentQuizIndex];
+            const progressPercent = ((currentQuizIndex) / quiz.length) * 100;
             document.getElementById('progressFill').style.width = progressPercent + '%';
 
             let html = `
                 <div class="question-card">
                     <div class="question-header">
-                        <div class="question-number">Q${quiz.id}</div>
-                        <div class="difficulty ${quiz.difficulty}">${quiz.difficulty.toUpperCase()}</div>
+                        <div class="question-number">Q${currentQuestion.id}</div>
+                        <div class="difficulty ${currentQuestion.difficulty}">${currentQuestion.difficulty.toUpperCase()}</div>
                     </div>
-                    <div class="question-text">${quiz.question}</div>
+                    <div class="question-text">${currentQuestion.question}</div>
                     <div class="options" id="optionsContainer">
             `;
 
-            quiz.options.forEach((option, index) => {
+            currentQuestion.options.forEach((option, index) => {
                 html += `<button class="option-btn" onclick="selectAnswer(${index}, ${currentQuizIndex})">${String.fromCharCode(65 + index)}) ${option}</button>`;
             });
 
             html += `
                     </div>
                     <div class="answer-section" id="answerSection">
-                        <div class="answer-title">✓ ${quiz.answer}</div>
-                        <p>${quiz.explanation}</p>
+                        <div class="answer-title">✓ ${currentQuestion.answer}</div>
+                        <p>${currentQuestion.explanation}</p>
                     </div>
                     <div class="button-group">
                         <button class="btn btn-submit" onclick="submitAnswer(${currentQuizIndex})">Submit Answer</button>
@@ -991,20 +1172,22 @@
             `;
 
             document.getElementById('quizContent').innerHTML = html;
-            updateStats();
+            updateStats(quiz.length);
         }
 
         function selectAnswer(index, quizIndex) {
+            const quiz = activeQuizSet === 'gamified' ? quizzes : traditionalQuizzes;
+            quiz[quizIndex].selectedAnswer = index;
             const buttons = document.querySelectorAll('.option-btn');
             buttons.forEach(btn => btn.classList.remove('selected'));
             buttons[index].classList.add('selected');
-            quizzes[quizIndex].selectedAnswer = index;
         }
 
         function submitAnswer(quizIndex) {
-            const quiz = quizzes[quizIndex];
+            const quiz = activeQuizSet === 'gamified' ? quizzes : traditionalQuizzes;
+            const currentQuestion = quiz[quizIndex];
             
-            if (quiz.selectedAnswer === undefined) {
+            if (currentQuestion.selectedAnswer === undefined) {
                 alert('Please select an answer!');
                 return;
             }
@@ -1012,16 +1195,16 @@
             answered++;
             const buttons = document.querySelectorAll('.option-btn');
             
-            if (quiz.selectedAnswer === quiz.correct) {
+            if (currentQuestion.selectedAnswer === currentQuestion.correct) {
                 correct++;
-                buttons[quiz.correct].classList.add('correct');
-                score += quiz.points;
+                buttons[currentQuestion.correct].classList.add('correct');
+                score += currentQuestion.points;
                 streak++;
-                showReward('Correct! 🎉', quiz.points);
+                showReward('Correct! 🎉', currentQuestion.points);
             } else {
                 streak = 0;
-                buttons[quiz.selectedAnswer].classList.add('incorrect');
-                buttons[quiz.correct].classList.add('correct');
+                buttons[currentQuestion.selectedAnswer].classList.add('incorrect');
+                buttons[currentQuestion.correct].classList.add('correct');
                 showReward('Incorrect!', 0);
             }
 
@@ -1071,8 +1254,9 @@
         }
 
         function updateStats() {
+            const quiz = activeQuizSet === 'gamified' ? quizzes : traditionalQuizzes;
             document.getElementById('currentQuestion').textContent = currentQuizIndex + 1;
-            document.getElementById('totalQuestions').textContent = quizzes.length;
+            document.getElementById('totalQuestions').textContent = quiz.length;
             document.getElementById('score').textContent = score;
             document.getElementById('streak').textContent = streak;
             
@@ -1081,6 +1265,7 @@
         }
 
         function showResults() {
+            const quiz = activeQuizSet === 'gamified' ? quizzes : traditionalQuizzes;
             const percentage = Math.round((score / 450) * 100);
             let badge = '';
             let message = '';
@@ -1110,7 +1295,7 @@
                     <div class="badge">${badge}</div>
                     <div class="score-message">${message}</div>
                     <p style="margin-top: 30px; color: #666;">
-                        <strong>Questions Answered:</strong> ${answered} / ${quizzes.length}<br>
+                        <strong>Questions Answered:</strong> ${answered} / ${quiz.length}<br>
                         <strong>Correct Answers:</strong> ${correct}<br>
                         <strong>Max Streak:</strong> 🔥 ${streak}
                     </p>
@@ -1171,7 +1356,19 @@
         function toggleChatbot(event) {
             if (event) event.stopPropagation();
             const container = document.getElementById('chatbotContainer');
-            container.classList.toggle('chatbot-closed');
+            const messagesDiv = document.getElementById('chatMessages');
+            const quickOptions = document.getElementById('quickOptions');
+            const input = document.querySelector('.chat-input');
+            
+            if (messagesDiv.style.display === 'none') {
+                messagesDiv.style.display = 'flex';
+                quickOptions.style.display = 'flex';
+                input.style.display = 'flex';
+            } else {
+                messagesDiv.style.display = 'none';
+                quickOptions.style.display = 'none';
+                input.style.display = 'none';
+            }
         }
 
         function addBotMessage(text) {
@@ -1287,7 +1484,15 @@
         // Initialize chat when page loads
         window.addEventListener('load', () => {
             initializeChat();
+            showChatbotButton();
         });
+
+        function showChatbotButton() {
+            const container = document.getElementById('chatbotContainer');
+            if (container) {
+                container.style.display = 'flex';
+            }
+        }
     </script>
 </body>
 </html>
