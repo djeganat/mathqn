@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grade 7 Math - Consolidated Question Paper</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .controls {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #e0e0e0;
+            justify-content: center;
+        }
+
+        .controls button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .btn-view-all {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-view-all:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .btn-answers {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-answers:hover {
+            background: #38a169;
+            transform: translateY(-2px);
+        }
+
+        .btn-section {
+            background: #ed8936;
+            color: white;
+        }
+
+        .btn-section:hover {
+            background: #dd6b20;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-title {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            font-weight: 600;
+        }
+
+        .question {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .question:hover {
+            background: #eef2ff;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+        }
+
+        .question-number {
+            font-weight: 700;
+            color: #667eea;
+            font-size: 1.1em;
+        }
+
+        .question-text {
+            margin: 10px 0;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .options {
+            margin: 15px 0;
+            padding-left: 20px;
+        }
+
+        .option {
+            margin: 8px 0;
+            color: #555;
+        }
+
+        .answer-toggle {
+            margin-top: 15px;
+            text-align: right;
+        }
+
+        .answer-toggle button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .answer-toggle button:hover {
+            background: #5568d3;
+        }
+
+        .answer {
+            margin-top: 15px;
+            padding: 15px;
+            background: #e6f7ed;
+            border-left: 4px solid #48bb78;
+            border-radius: 4px;
+            color: #22543d;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        .answer.show {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                max-height: 0;
+            }
+            to {
+                opacity: 1;
+                max-height: 500px;
+            }
+        }
+
+        .answer-title {
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #2f855a;
+        }
+
+        .stats {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            text-align: center;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .stats p {
+            font-size: 1.2em;
+        }
+
+        .section-nav {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.5em;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .controls button {
+                width: 100%;
+            }
+
+            .section-nav {
+                flex-direction: column;
+            }
+
+            .section-nav button {
+                width: 100%;
+            }
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        table th {
+            background: #667eea;
+            color: white;
+        }
+
+        table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📐 Grade 7 Mathematics</h1>
+            <p>Consolidated Question Paper</p>
+            <p style="font-size: 0.9em; margin-top: 10px;">Unit Assessment II - December 2024 | Duration: 2 Hours | Total Marks: 80</p>
+        </header>
+
+        <div class="controls">
+            <button class="btn-view-all" onclick="showAllQuestions()">📋 View All Questions</button>
+            <button class="btn-answers" onclick="toggleAllAnswers()">💡 Toggle All Answers</button>
+            <button class="btn-section" onclick="showSection('sectionA')">Section A (MCQ)</button>
+            <button class="btn-section" onclick="showSection('sectionB')">Section B</button>
+            <button class="btn-section" onclick="showSection('sectionC')">Section C</button>
+            <button class="btn-section" onclick="showSection('sectionD')">Section D</button>
+            <button class="btn-section" onclick="showSection('sectionE')">Section E</button>
+            <button class="btn-section" onclick="showSection('sectionF')">Section F</button>
+        </div>
+
+        <div class="content">
+            <!-- SECTION A -->
+            <div id="sectionA" class="section">
+                <div class="section-title">Section A: Multiple Choice Questions (5 Marks)</div>
+                
+                <div class="question">
+                    <div class="question-number">Q1.</div>
+                    <div class="question-text">An unbiased coin is tossed once, the probability of getting head is</div>
+                    <div class="options">
+                        <div class="option">(a) 8/4</div>
+                        <div class="option">(b) 1</div>
+                        <div class="option">(c) 1/2</div>
+                        <div class="option">(d) 5/7</div>
+                    </div>
+                    <div class="answer-toggle">
+                        <button onclick="toggleAnswer(this)">Show Answer</button>
+                    </div>
+                    <div class="answer">
+                        <div class="answer-title">Answer: (c) 1/2</div>
+                        <p>Probability of getting head when tossing an unbiased coin = 1/2 (or 50%)</p>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">Q2.</div>
+                    <div class="question-text">Which statement is true about proportions?</div>
+                    <div class="options">
+                        <div class="option">(a) 2:3 = 4:5</div>
+                        <div class="option">(b) 2:3 = 4:6</div>
+                        <div class="option">(c) 2:3 ≠ 4:5</div>
+                        <div class="option">(d) 2:3 ≠ 4:6</div>
+                    </div>
+                    <div class="answer-toggle">
+                        <button onclick="toggleAnswer(this)">Show Answer</button>
+                    </div>
+                    <div class="answer">
+                        <div class="answer-title">Answer: (b) 2:3 = 4:6</div>
+                        <p>2:3 = 4:6 ⟹ 2 × 6 = 3 × 4 ⟹ 12 = 12 ✓</p>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">Q3.</div>
+                    <div class="question-text">If l || m and m || n, what is the relationship between l and n?</div>
+                    <div class="options">
+                        <div class="option">(a) l || n</div>
+                        <div class="option">(b) l ⊥ n</div>
+                        <div class="option">(c) l intersects n</div>
+                        <div class="option">(d) l # n</div>
+                    </div>
+                    <div class="answer-toggle">
+                        <button onclick="toggleAnswer(this)">Show Answer</button>
+                    </div>
+                    <div class="answer">
+                        <div class="answer-title">Answer: (a) l || n</div>
+                        <p>If l || m and m || n, then l || n (Transitive property of parallel lines)</p>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">Q4.</div>
+                    <div class="question-text">Assertion (A): When two parallel lines are intersected by transversal, the angles of any pair of alternate angles are supplementary.</div>
+                    <div class="question-text"><strong>Reason (R):</strong> When two parallel lines are intersected by transversal, the angles of any pair of corresponding angles are equal.</div>
+                    <div class="options">
+                        <div class="option">(a) Both A and R are true and R is the correct explanation of A</div>
+                        <div class="option">(b) Both A and R are true but R is not the correct explanation of A</div>
+                        <div class="option">(c) A is true but R is false</div>
+                        <div class="option">(d) A is false but R is true</div>
+                    </div>
+                    <div class="answer-toggle">
+                        <button onclick="toggleAnswer(this)">Show Answer</button>
+                    </div>
+                    <div class="answer">
+                        <div class="answer-title">Answer: (d) A is false but R is true</div>
+                        <p>Alternate angles are equal (not supplementary) when parallel lines are cut by transversal. Corresponding angles are equal (R is true).</p>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">Q5.</div>
+                    <div class="question-text">There are 10 marbles in a box marked with distinct numbers from 1 to 10. A marble is drawn randomly. Find the probability of getting a prime numbered marble.</div>
+                    <div class="answer-toggle">
+                        <button onclick="toggleAnswer(this)">Show Answer</button>
+                    </div>
+                    <div class="answer">
+                        <div class="answer-title">Answer: 4/10 = 2/5</div>
+                        <p>Prime numbers from 1 to 10: 2, 3, 5, 7 (4 prime numbers)</p>
+                        <p>Probability = 4/10 = 2/5 = 0.4 or 40%</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION B -->
+            <div id="sectionB" class="section">
+                <div class="section-title">Section B: Short Answer Questions (10 Marks)</div>
+
+                <div class="question">
+                    <div class="question-number">Q6.</div>
+                    <div class="question-text">Express the ratio 6:7 in its simplest form.</div>
+                    <div class="answer-toggle">
+                        <button onclick="toggleAnswer(this)">Show Answer</button>
+                    </div>
+                    <div class="answer">
+                        <div class="answer-title">Answer: 6:7</div>
+                        <p>The ratio 6:7 is already in its simplest form because GCD(6,7) = 1</p>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">Q7.</div>
+                    <div class="question-text">If 8:x :: 16:35, then find the value of x.</div>
+                    <div class="answer-toggle">
+                        <button onclick="toggleAnswer(this)">Show Answer</button>
+                    </div>
+                    <div class="answer">
+                        <div class="answer-title">Answer: x = 17.5</div>
+                        <p>8:x :: 16:35</p>
+                        <p>8 × 35 = 16 × x</p>
+                        <p>280 = 16x</p>
+                        <p>x = 280/16 = 17.5</p>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">Q8.</div>
+                    <div class="question-text">The angles of a triangle are in the ratio 2:3:7. Find the largest and smallest angle.</div>
+                    <div class="answer-toggle">
+                        <button onclick="toggleAnswer(this)">Show Answer</button>
+                    </div>
+                    <div class="answer">
+                        <div class="answer-title">Answer: Smallest = 30°, Largest = 105°</div>
+                        <p>Angles are in ratio 2:3:7</p>
+                        <p>Total parts = 2 + 3 + 7 = 12</p>
+                        <p>Sum of angles in triangle = 180°</p>
+                        <p>Each part = 180/12 = 15°</p>
+                        <p>Smallest angle = 2 × 15° = 30°</p>
+                        <p>Largest angle = 7 × 15° = 105°</p>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">Q9.</div>
+                    <div class="question-text">One of the angles of a triangle is 70° and the other two angles are equal. Find these two angles.</div>
+                    <div class="answer-toggle">
+                        <button onclick="toggleAnswer(this)">Show Answer</button>
+                    </div>
+                    <div class="answer">
+                        <div class="answer-title">Answer: 55°, 55°</div>
+                        <p>One angle = 70°</p>
+                        <p>Other two equal angles = x each</p>
+                        <p>70 + x + x = 180°</p>
+                        <p>70 + 2x = 180°</p>
+                        <p>2x = 110°</p>
+                        <p>x = 55°</p>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">Q10.</div>
+                    <div class="question-text">The angles of a triangle are (x + 21)°, x° and (2x - 45)°. Find the value of x.</div>
+                    <div class="answer-toggle">
+                        <button onclick="toggleAnswer(this)">Show Answer</button>
+                    </div>
+                    <div class="answer">
+                        <div class="answer-title">Answer: x = 51°</div>
+                        <p>(x + 21) + x + (2x - 45) = 180°</p>
+                        <p>4x - 24 = 180°</p>
+                        <p>4x = 204°</p>
+                        <p>x = 51°</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION C -->
+            <div id="sectionC" class="section">
+                <div class="section-title">Section C: Medium Answer Questions (10 Marks)</div>
+
+                <div class="question">
+                    <div class="question-number">Q11.</div>
+                    <div class="question-text">Two numbers are in the ratio 3:5. If 8 is added to each number, the ratio becomes 2:3. Find the numbers.</div>
+                    <div class="answer-toggle">
+                        <button onclick="toggleAnswer(this)">Show Answer</button>
+                    </div>
+                    <div class="answer">
+                        <div class="answer-title">Answer: 24 and 40</div>
+                        <p>Let the numbers be 3k and 5k</p>
+                        <p>(3k + 8):(5k + 8) = 2:3</p>
+                        <p>3(3k + 8) = 2(5k + 8)</p>
+                        <p>9k + 24 = 10k + 16</p>
+                        <p>k = 8</p>
+                        <p>Numbers: 3(8) = 24 and 5(8) = 40</p>
+                        <p>Verification: (24+8):(40+8) = 32:48 = 2:3 ✓</p>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">Q12.</div>
+                    <div class="question-text">Three numbers are in the ratio 2:3:5 and the sum of these numbers is 800. Find the numbers.</div>
+                    <div class="answer-toggle">
+                        <button onclick="toggleAnswer(this)">Show Answer</button>
+                    </div>
+                    <div class="answer">
+                        <div class="answer-title">Answer: 160, 240, 400</div>
+                        <p>Let numbers be 2k, 3k, 5k</p>
+                        <p>2k + 3k + 5k = 800</p>
+                        <p>10k = 800</p>
+                        <p>k = 80</p>
+                        <p>Numbers: 2(80) = 160, 3(80) = 240, 5(80) = 400</p>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">Q13.</div>
+                    <div class="question-text">The ages of two persons are in the ratio 5:7. Eighteen years ago their ages were in the ratio 8:13. Find their present ages.</div>
+                    <div class="answer-toggle">
+                        <button onclick="toggleAnswer(this)">Show Answer</button>
+                    </div>
+                    <div class="answer">
+                        <div class="answer-title">Answer: Present ages are 50 and 70 years</div>
+                        <p>Let ages be 5k and 7k</p>
+                        <p>18 years ago: (5k - 18):(7k - 18) = 8:13</p>
+                        <p>13(5k - 18) = 8(7k - 18)</p>
+                        <p>65k - 234 = 56k - 144</p>
+                        <p>9k = 90</p>
+                        <p>k = 10</p>
+                        <p>Present ages: 5(10) = 50 and 7(10) = 70 years</p>
+                        <p>Verification: (50-18):(70-18) = 32:52 = 8:13 ✓</p>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">Q14.</div>
+                    <div class="question-text">The boys and the girls in a school are in the ratio 7:4. If total strength of the school be 550, find the number of boys and girls.</div>
+                    <div class="answer-toggle">
+                        <button onclick="toggleAnswer(this)">Show Answer</button>
+                    </div>
+                    <div class="answer">
+                        <div class="answer-title">Answer: Boys = 350, Girls = 200</div>
+                        <p>Ratio 7:4, Total = 550</p>
+                        <p>Boys = (7/11) × 550 = 350</p>
+                        <p>Girls = (4/11) × 550 = 200</p>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">Q15.</div>
+                    <div class="question-text">The ratio of monthly income to the savings of a family is 7:2. If the savings be of Rs. 500, find the income and expenditure.</div>
+                    <div class="answer-toggle">
+                        <button onclick="toggleAnswer(this)">Show Answer</button>
+                    </div>
+                    <div class="answer">
+                        <div class="answer-title">Answer: Income = ₹1750, Expenditure = ₹1250</div>
+                        <p>Ratio 7:2, Savings = ₹500</p>
+                        <p>2 parts = ₹500, so 1 part = ₹250</p>
+                        <p>Income = 7 × 250 = ₹1750</p>
+                        <p>Expenditure = 1750 - 500 = ₹1250</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION D -->
+            <div id="sectionD" class="section">
+                <div class="section-title">Section D: Problem Solving (20 Marks)</div>
+
+                <div class="question">
+                    <div class="question-number">Q16.</div>
+                    <div class="question-text">A man goes 10 m due east and then 24 m due north. Find the distance from the starting point.</div>
+                    <div class="answer-toggle">
+                        <button onclick="toggleAnswer(this)">Show Answer</button>
+                    </div>
+                    <div class="answer">
+                        <div class="answer-title">Answer: 26 m</div>
+                        <p>Using Pythagoras theorem:</p>
+                        <p>Distance = √(10² + 24²) = √(100 + 576) = √676 = 26 m</p>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">Q17.</div>
+                    <div class="question-text">Two poles of heights 6 m and 11 m stand on a plane ground. If the distance between their feet is 12 m, find the distance between their tops.</div>
+                    <div class="answer-toggle">
+                        <button onclick="toggleAnswer(this)">Show Answer</button>
+                    </div>
+                    <div class="answer">
+                        <div class="answer-title">Answer: 13 m</div>
+                        <p>Height difference = 11 - 6 = 5 m</p>
+                        <p>Horizontal distance = 12 m</p>
+                        <p>Distance between tops = √(5² + 12²) = √(25 + 144) = √169 = 13 m</p>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">Q18.</div>
+                    <div class="question-text">A chimney 20 m high casts a shadow of length 25 m at 11 am. At the same time, a power line casts a shadow of length 40 m. Find the height of the power line.</div>
+                    <div class="answer-toggle">
+                        <button onclick="toggleAnswer(this)">Show Answer</button>
+                    </div>
+                    <div class="answer">
+                        <div class="answer-title">Answer: 32 m</div>
+                        <p>Height of chimney/Length of shadow = Height of line/Length of shadow</p>
+                        <p>20/25 = h/40</p>
+                        <p>h = (20 × 40)/25 = 800/25 = 32 m</p>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">Q19.</div>
+                    <div class="question-text">In a cricket match, a batsman hits a boundary 6 times out of 30 balls he plays. Find the probability that he (i) hit a boundary (ii) did not hit a boundary</div>
+                    <div class="answer-toggle">
+                        <button onclick="toggleAnswer(this)">Show Answer</button>
+                    </div>
+                    <div class="answer">
+                        <div class="answer-title">Answer:</div>
+                        <p><strong>(i) Probability of hitting a boundary = 6/30 = 1/5 = 0.2 or 20%</strong></p>
+                        <p><strong>(ii) Probability of not hitting a boundary = 24/30 = 4/5 = 0.8 or 80%</strong></p>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">Q20.</div>
+                    <div class="question-text">A dice is thrown 100 times and the outcomes are noted. When a dice is thrown at random, find the probability of getting: (i) 2 (ii) 6</div>
+                    <table>
+                        <tr>
+                            <th>Outcome</th>
+                            <th>1</th>
+                            <th>2</th>
+                            <th>3</th>
+                            <th>4</th>
+                            <th>5</th>
+                            <th>6</th>
+                        </tr>
+                        <tr>
+                            <td>Frequency</td>
+                            <td>11</td>
+                            <td>15</td>
+                            <td>21</td>
+                            <td>19</td>
+                            <td>20</td>
+                            <td>14</td>
+                        </tr>
+                    </table>
+                    <div class="answer-toggle">
+                        <button onclick="toggleAnswer(this)">Show Answer</button>
+                    </div>
+                    <div class="answer">
+                        <div class="answer-title">Answer:</div>
+                        <p><strong>(i) Probability of getting 2 = 15/100 = 3/20 = 0.15 or 15%</strong></p>
+                        <p><strong>(ii) Probability of getting 6 = 14/100 = 7/50 = 0.14 or 14%</strong></p>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">Q21.</div>
+                    <div class="question-text">Of the three angles of a triangle, one is three times the smallest and the other is five times the smallest. Find the angles.</div>
+                    <div class="answer-toggle">
+                        <button onclick="toggleAnswer(this)">Show Answer</button>
+                    </div>
+                    <div class="answer">
+                        <div class="answer-title">Answer: 20°, 60°, 100°</div>
+                        <p>Let smallest angle = x</p>
+                        <p>Angles: x, 3x, 5x</p>
+                        <p>x + 3x + 5x = 180°</p>
+                        <p>9x = 180°</p>
+                        <p>x = 20°</p>
+                        <p>Angles: 20°, 60°, 100°</p>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">Q22.</div>
+                    <div class="question-text">One of the exterior angles of a triangle is 80° and the interior opposite angles are in the ratio 3:5. Find the angles of the triangle.</div>
+                    <div class="answer-toggle">
+                        <button onclick="toggleAnswer(this)">Show Answer</button>
+                    </div>
+                    <div class="answer">
+                        <div class="answer-title">Answer: 30°, 50°, 100°</div>
+                        <p>Exterior angle = 80° (equal to sum of opposite interior angles)</p>
+                        <p>Let opposite angles be 3k and 5k</p>
+                        <p>3k + 5k = 80°</p>
+                        <p>8k = 80°</p>
+                        <p>k = 10°</p>
+                        <p>Opposite angles: 30° and 50°</p>
+                        <p>Third angle: 180° - 80° = 100°</p>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">Q23.</div>
+                    <div class="question-text">Shivkumar sold one of his properties for ₹72,00,000. He divided this money between his sons Atul and Praful in the ratio 7:11. Find the amount Praful received.</div>
+                    <div class="answer-toggle">
+                        <button onclick="toggleAnswer(this)">Show Answer</button>
+                    </div>
+                    <div class="answer">
+                        <div class="answer-title">Answer: ₹44,00,000</div>
+                        <p>Ratio 7:11, Total = ₹72,00,000</p>
+                        <p>Praful's share = (11/18) × 72,00,000 = ₹44,00,000</p>
+                        <p>Atul's share = (7/18) × 72,00,000 = ₹28,00,000</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION E -->
+            <div id="sectionE" class="section">
+                <div class="section-title">Section E: Geometry & Advanced Problems (15 Marks)</div>
+
+                <div class="question">
+                    <div class="question-number">Q24.</div>
+                    <div class="question-text">Find the fourth proportional to 3, 5 and 6.</div>
+                    <div class="answer-toggle">
+                        <button onclick="toggleAnswer(this)">Show Answer</button>
+                    </div>
+                    <div class="answer">
+                        <div class="answer-title">Answer: 10</div>
+                        <p>Let fourth proportional be x</p>
+                        <p>3:5 :: 6:x</p>
+                        <p>3x = 5 × 6</p>
+                        <p>3x = 30</p>
+                        <p>x = 10</p>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">Q25.</div>
+                    <div class="question-text">Find the fourth proportional to 11, 15 and 22.</div>
+                    <div class="answer-toggle">
+                        <button onclick="toggleAnswer(this)">Show Answer</button>
+                    </div>
+                    <div class="answer">
+                        <div class="answer-title">Answer: 30</div>
+                        <p>Let fourth proportional be x</p>
+                        <p>11:15 :: 22:x</p>
+                        <p>11x = 15 × 22</p>
+                        <p>11x = 330</p>
+                        <p>x = 30</p>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">Q26.</div>
+                    <div class="question-text">Find the third proportional to 2, 9 and 15.</div>
+                    <div class="answer-toggle">
+                        <button onclick="toggleAnswer(this)">Show Answer</button>
+                    </div>
+                    <div class="answer">
+                        <div class="answer-title">Answer: 67.5</div>
+                        <p>Using the sequence: 2, 9, 15, x</p>
+                        <p>2:9 :: 15:x</p>
+                        <p>2x = 9 × 15</p>
+                        <p>2x = 135</p>
+                        <p>x = 67.5</p>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">Q27.</div>
+                    <div class="question-text">Find the third proportional to 11, 13 and 26.</div>
+                    <div class="answer-toggle">
+                        <button onclick="toggleAnswer(this)">Show Answer</button>
+                    </div>
+                    <div class="answer">
+                        <div class="answer-title">Answer: 15.36 (approximately)</div>
+                        <p>Let third proportional be x</p>
+                        <p>11:13 :: 13:x (assuming standard form)</p>
+                        <p>11x = 13 × 13</p>
+                        <p>11x = 169</p>
+                        <p>x = 169/11 ≈ 15.36</p>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">Q28.</div>
+                    <div class="question-text">Find the mean proportional between (i) 6 and 24 (ii) 3 and 27 (iii) 0.4 and 0.9</div>
+                    <div class="answer-toggle">
+                        <button onclick="toggleAnswer(this)">Show Answer</button>
+                    </div>
+                    <div class="answer">
+                        <div class="answer-title">Answer:</div>
+                        <p><strong>(i) Mean proportional between 6 and 24 = √(6 × 24) = √144 = 12</strong></p>
+                        <p><strong>(ii) Mean proportional between 3 and 27 = √(3 × 27) = √81 = 9</strong></p>
+                        <p><strong>(iii) Mean proportional between 0.4 and 0.9 = √(0.4 × 0.9) = √0.36 = 0.6</strong></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION F -->
+            <div id="sectionF" class="section">
+                <div class="section-title">Section F: Additional Problems</div>
+
+                <div class="question">
+                    <div class="question-number">Q29.</div>
+                    <div class="question-text">The sides of a triangle are in the ratio 1:2:3. If the perimeter is 36 cm, find its sides.</div>
+                    <div class="answer-toggle">
+                        <button onclick="toggleAnswer(this)">Show Answer</button>
+                    </div>
+                    <div class="answer">
+                        <div class="answer-title">Answer: 6 cm, 12 cm, 18 cm</div>
+                        <p>Let sides be k, 2k, 3k</p>
+                        <p>k + 2k + 3k = 36</p>
+                        <p>6k = 36</p>
+                        <p>k = 6</p>
+                        <p>Sides: 6 cm, 12 cm, 18 cm</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats">
+            <p>📊 Total Questions: 29 | Total Marks: 80 | Duration: 2 Hours</p>
+        </div>
+
+        <div class="footer">
+            <p>Grade 7 Mathematics | Unit Assessment II - December 2024</p>
+            <p style="margin-top: 10px; font-size: 0.8em;">📧 For suggestions or improvements, please provide feedback</p>
+        </div>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            const selected = document.getElementById(sectionId);
+            if (selected) {
+                selected.classList.add('active');
+                selected.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        function showAllQuestions() {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => {
+                section.classList.add('active');
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleAnswer(button) {
+            const answer = button.closest('.answer-toggle').nextElementSibling;
+            answer.classList.toggle('show');
+            button.textContent = answer.classList.contains('show') ? '✓ Hide Answer' : 'Show Answer';
+        }
+
+        function toggleAllAnswers() {
+            const allAnswers = document.querySelectorAll('.answer');
+            const allButtons = document.querySelectorAll('.answer-toggle button');
+            
+            const allShown = Array.from(allAnswers).every(ans => ans.classList.contains('show'));
+            
+            allAnswers.forEach(answer => {
+                if (allShown) {
+                    answer.classList.remove('show');
+                } else {
+                    answer.classList.add('show');
+                }
+            });
+
+            allButtons.forEach(button => {
+                button.textContent = allShown ? 'Show Answer' : '✓ Hide Answer';
+            });
+        }
+
+        // Show section A by default
+        window.addEventListener('load', () => {
+            showSection('sectionA');
+        });
+    </script>
+</body>
+</html>
